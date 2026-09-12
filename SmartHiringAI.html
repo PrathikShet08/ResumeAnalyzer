@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Hiring AI</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f9;
+    }
+    h1 {
+      color: #4b0082;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input[type="file"], button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+    }
+    .results {
+      margin-top: 20px;
+    }
+    .candidate {
+      background: #e6e6fa;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Smart Hiring AI</h1>
+
+    <p>Upload Job Description (PDF):</p>
+    <input type="file" id="jd" accept="application/pdf">
+
+    <p>Upload Resumes (PDFs):</p>
+    <input type="file" id="resumes" multiple accept="application/pdf">
+
+    <button onclick="rankCandidates()">Generate Ranking</button>
+
+    <div class="results" id="results"></div>
+  </div>
+
+  <!-- PDF.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+
+  <script>
+    // Stopword list to ignore filler words
+    const stopwords = ["a", "an", "the", "and", "or", "of", "in", "on", "at", "to", "for", "with"];
+
+    async function readPDF(file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+      let text = "";
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(item => item.str).join(" ") + " ";
+      }
+      return text.toLowerCase();
+    }
+
+    function cleanWords(text) {
+      return text
+        .split(/\s+/) // split by whitespace
+        .map(word => word.replace(/[^a-z]/g, "")) // remove punctuation
+        .filter(word => word && !stopwords.includes(word)); // remove stopwords
+    }
+
+    async function rankCandidates() {
+      const jdFile = document.getElementById("jd").files[0];
+      const resumeFiles = document.getElementById("resumes").files;
+
+      if (!jdFile || resumeFiles.length === 0) {
+        alert("Please upload both JD and resumes.");
+        return;
+      }
+
+      const jdText = await readPDF(jdFile);
+      const jdWords = cleanWords(jdText);
+
+      let results = [];
+      for (let file of resumeFiles) {
+        const resumeText = await readPDF(file);
+        const resumeWords = cleanWords(resumeText);
+        const matches = jdWords.filter(word => resumeWords.includes(word));
+        const score = (matches.length / jdWords.length) * 100;
+        results.push({name: file.name, score: score.toFixed(2), matches: matches});
+      }
+
+      results.sort((a, b) => b.score - a.score);
+
+      let output = "<h2>Ranked Candidates</h2>";
+      results.forEach((r, index) => {
+        output += `
+          <div class="candidate">
+            <strong>Candidate ${index+1}</strong><br>
+            Resume: ${r.name}<br>
+            Score: ${r.score}%<br>
+            Explanation: Matched skills include ${r.matches.slice(0,10).join(", ")}...
+          </div>
+        `;
+      });
+
+      document.getElementById("results").innerHTML = output;
+    }
+  </script>
+</body>
+</html>
