@@ -1,54 +1,355 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Smart Hiring AI</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f4f4f9;
-    }
-    h1 {
-      color: #4b0082;
-    }
-    .container {
-      max-width: 800px;
-      margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    input[type="file"], button {
-      width: 100%;
-      margin: 10px 0;
-      padding: 10px;
-    }
-    .results {
-      margin-top: 20px;
-    }
-    .candidate {
-      background: #e6e6fa;
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 5px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smart Hiring</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --paper: #F6F4EE;
+    --surface: #FFFFFF;
+    --ink: #1B1E19;
+    --ink-soft: #5B5F53;
+    --line: #DCD8CB;
+    --accent: #24503F;
+    --accent-dark: #1A3B2F;
+    --accent-soft: #E1EAE4;
+    --gold: #B8862E;
+    --warn: #9C4221;
+    --radius: 8px;
+    --shadow: 0 1px 2px rgba(27,30,25,0.06);
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', Arial, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page{
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 3.5rem 1.5rem 4rem;
+  }
+
+  .masthead h1{
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: 2.5rem;
+    letter-spacing: -0.01em;
+    margin: 0 0 0.4rem;
+  }
+
+  .masthead .tagline{
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 1rem;
+    max-width: 46ch;
+  }
+
+  .rule{
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 2.25rem 0;
+  }
+
+  .panel{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.85rem 1.75rem;
+  }
+
+  .field{ margin-bottom: 1.6rem; }
+  .field:last-of-type{ margin-bottom: 0; }
+
+  .field-head{
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.65rem;
+  }
+
+  .field-num{
+    font-family: 'Fraunces', Georgia, serif;
+    color: var(--gold);
+    font-size: 1.15rem;
+    min-width: 1.3rem;
+  }
+
+  .field-label{
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+
+  .field-hint{
+    margin: 0.35rem 0 0 1.9rem;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+  }
+
+  .file-control{
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+    margin-left: 1.9rem;
+  }
+
+  .visually-hidden-file{
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .file-button{
+    display: inline-flex;
+    align-items: center;
+    padding: 0.6rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .file-button:hover{
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .file-name{
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+
+  .primary-button{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1.85rem;
+    margin-left: 1.9rem;
+    padding: 0.8rem 1.65rem;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .primary-button:hover{ background: var(--accent-dark); }
+
+  input:focus-visible,
+  .file-button:focus-visible,
+  .primary-button:focus-visible{
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .results{ margin-top: 2.75rem; }
+
+  .results-head{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+  }
+
+  .results-head h2{
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 500;
+    font-size: 1.3rem;
+    margin: 0;
+  }
+
+  .status{
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+  .status--warn{ color: var(--warn); }
+  .status--busy{ color: var(--accent); }
+
+  .empty-state{
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    padding: 1.75rem 0;
+    max-width: 46ch;
+  }
+
+  .candidate{
+    display: flex;
+    gap: 1.1rem;
+    align-items: flex-start;
+    padding: 1.15rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .candidate:last-child{ border-bottom: none; }
+
+  .candidate--top{
+    background: var(--accent-soft);
+    border-radius: 6px;
+    margin: 0 -1rem;
+    padding: 1.15rem 1rem;
+  }
+  .candidate--top + .candidate{ border-top: none; }
+
+  .candidate-rank{
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.7rem;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+    min-width: 2.2ch;
+    line-height: 1.15;
+  }
+
+  .candidate--top .candidate-rank{ color: var(--gold); }
+
+  .candidate-body{ flex: 1; min-width: 0; }
+
+  .candidate-head{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .candidate-name{
+    font-weight: 500;
+    word-break: break-word;
+  }
+
+  .candidate-score{
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.3rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .bar-track{
+    height: 6px;
+    background: var(--accent-soft);
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 0.55rem 0;
+  }
+  .candidate--top .bar-track{ background: rgba(255,255,255,0.6); }
+
+  .bar-fill{
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+  }
+
+  .candidate-matches{
+    margin: 0.15rem 0 0;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    line-height: 1.55;
+  }
+
+  .matches-label{
+    color: var(--ink);
+    font-weight: 500;
+    margin-right: 0.35rem;
+  }
+
+  .footnote{
+    margin-top: 3rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width: 560px){
+    .page{ padding: 2.25rem 1.25rem 3rem; }
+    .masthead h1{ font-size: 2rem; }
+    .field-hint, .file-control, .primary-button{ margin-left: 0; }
+    .candidate-head{ flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+    .candidate--top{ margin: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition: none !important; }
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>Smart Hiring AI</h1>
 
-    <p>Upload Job Description (PDF):</p>
-    <input type="file" id="jd" accept="application/pdf">
+  <div class="page">
+    <header class="masthead">
+      <h1>Smart Hiring</h1>
+      <p class="tagline">Upload a role and a stack of resumes. Get every candidate ranked by how closely their resume matches the job description.</p>
+    </header>
 
-    <p>Upload Resumes (PDFs):</p>
-    <input type="file" id="resumes" multiple accept="application/pdf">
+    <hr class="rule">
 
-    <button onclick="rankCandidates()">Generate Ranking</button>
+    <section class="panel">
+      <div class="field">
+        <div class="field-head">
+          <span class="field-num">1</span>
+          <label for="jd" class="field-label">Job description</label>
+        </div>
+        <div class="file-control">
+          <label for="jd" class="file-button">Choose PDF</label>
+          <span class="file-name" id="jdFileName">No file chosen</span>
+        </div>
+        <input type="file" id="jd" accept="application/pdf" class="visually-hidden-file">
+      </div>
 
-    <div class="results" id="results"></div>
+      <div class="field">
+        <div class="field-head">
+          <span class="field-num">2</span>
+          <label for="resumes" class="field-label">Resumes</label>
+        </div>
+        <div class="file-control">
+          <label for="resumes" class="file-button">Choose PDFs</label>
+          <span class="file-name" id="resumesFileName">No files chosen</span>
+        </div>
+        <input type="file" id="resumes" multiple accept="application/pdf" class="visually-hidden-file">
+      </div>
+
+      <button class="primary-button" onclick="rankCandidates()">Rank candidates</button>
+    </section>
+
+    <section class="results" aria-live="polite">
+      <div class="results-head">
+        <h2>Ranked candidates</h2>
+        <p class="status" id="status"></p>
+      </div>
+      <div id="results">
+        <p class="empty-state" id="emptyState">Upload a job description and resumes, then rank candidates to see results here.</p>
+      </div>
+    </section>
+
+    <p class="footnote">Matching runs entirely in your browser — resumes and job descriptions are read locally and are never uploaded anywhere.</p>
   </div>
 
   <!-- PDF.js library -->
@@ -77,20 +378,48 @@
         .filter(word => word && !stopwords.includes(word)); // remove stopwords
     }
 
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // Keep the file-name labels in sync with what's actually selected
+    document.getElementById("jd").addEventListener("change", (e) => {
+      const el = document.getElementById("jdFileName");
+      el.textContent = e.target.files[0] ? e.target.files[0].name : "No file chosen";
+    });
+
+    document.getElementById("resumes").addEventListener("change", (e) => {
+      const el = document.getElementById("resumesFileName");
+      const n = e.target.files.length;
+      el.textContent = n === 0 ? "No files chosen" : (n === 1 ? e.target.files[0].name : `${n} files selected`);
+    });
+
     async function rankCandidates() {
       const jdFile = document.getElementById("jd").files[0];
       const resumeFiles = document.getElementById("resumes").files;
+      const statusEl = document.getElementById("status");
+      const resultsEl = document.getElementById("results");
 
       if (!jdFile || resumeFiles.length === 0) {
-        alert("Please upload both JD and resumes.");
+        statusEl.className = "status status--warn";
+        statusEl.textContent = "Add a job description and at least one resume to continue.";
         return;
       }
+
+      statusEl.className = "status status--busy";
+      statusEl.textContent = "Reading job description…";
+      resultsEl.innerHTML = "";
 
       const jdText = await readPDF(jdFile);
       const jdWords = cleanWords(jdText);
 
       let results = [];
+      let i = 0;
       for (let file of resumeFiles) {
+        i++;
+        statusEl.textContent = `Reading resume ${i} of ${resumeFiles.length}…`;
         const resumeText = await readPDF(file);
         const resumeWords = cleanWords(resumeText);
         const matches = jdWords.filter(word => resumeWords.includes(word));
@@ -100,20 +429,28 @@
 
       results.sort((a, b) => b.score - a.score);
 
-      let output = "<h2>Ranked Candidates</h2>";
+      statusEl.className = "status";
+      statusEl.textContent = `Ranked ${results.length} candidate${results.length === 1 ? "" : "s"}.`;
+
       results.forEach((r, index) => {
-        output += `
-          <div class="candidate">
-            <strong>Candidate ${index+1}</strong><br>
-            Resume: ${r.name}<br>
-            Score: ${r.score}%<br>
-            Explanation: Matched skills include ${r.matches.slice(0,10).join(", ")}...
+        const row = document.createElement("div");
+        row.className = "candidate" + (index === 0 ? " candidate--top" : "");
+        const matchList = r.matches.slice(0, 10).join(", ") || "no direct keyword overlap";
+        row.innerHTML = `
+          <div class="candidate-rank">${String(index + 1).padStart(2, "0")}</div>
+          <div class="candidate-body">
+            <div class="candidate-head">
+              <span class="candidate-name">${escapeHtml(r.name)}</span>
+              <span class="candidate-score">${r.score}%</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width:${Math.min(r.score, 100)}%"></div></div>
+            <p class="candidate-matches"><span class="matches-label">Matched</span>${escapeHtml(matchList)}</p>
           </div>
         `;
+        resultsEl.appendChild(row);
       });
-
-      document.getElementById("results").innerHTML = output;
     }
   </script>
+
 </body>
 </html>
